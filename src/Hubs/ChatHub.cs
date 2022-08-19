@@ -75,5 +75,25 @@ namespace SimpleSignalRChatApp.Hubs
                     "ActiveRooms",
                     await _chatRoomService.GetAllRooms());
         }
+
+       
+        public async Task JoinRoom(Guid roomId)
+        {
+            if (roomId == Guid.Empty)
+                throw new ArgumentException("Invalid room ID");
+
+            await Groups.AddToGroupAsync(
+                Context.ConnectionId, roomId.ToString());
+        }
+
+       
+        public async Task LeaveRoom(Guid roomId)
+        {
+            if (roomId == Guid.Empty)
+                throw new ArgumentException("Invalid room ID");
+
+            await Groups.RemoveFromGroupAsync(
+                Context.ConnectionId, roomId.ToString());
+        }
     }
 }

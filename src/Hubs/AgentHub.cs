@@ -33,7 +33,7 @@ namespace SimpleSignalRChatApp.Hubs
         {
             var message = new ChatMessage
             {
-                SenderName = Context.User.Identity.Name,
+                SenderName ="Agent", //Context.User.Identity.Name,
                 Text = text,
                 SentAt = DateTimeOffset.UtcNow
             };

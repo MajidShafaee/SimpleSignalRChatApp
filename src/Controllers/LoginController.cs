@@ -12,7 +12,7 @@ namespace SimpleSignalRChatApp.Controllers
             return View();
         }
         [HttpPost]
-        public IActionResult Login([FromQuery] string returnUrl = null)
+        public async Task<IActionResult> Login([FromQuery] string returnUrl = null)
         {
             
 
@@ -33,11 +33,10 @@ namespace SimpleSignalRChatApp.Controllers
             {
                 RedirectUri = returnUrl ?? Url.Content("~/agent")
             };
-
-            return SignIn(
-                new ClaimsPrincipal(identity),
-                properties,
-                CookieAuthenticationDefaults.AuthenticationScheme);
+            
+          await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), properties);
+            return LocalRedirectPermanent("/agent");
+            
         }
     }
 }

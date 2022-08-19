@@ -15,6 +15,14 @@ namespace SimpleSignalRChatApp.Controllers
 
         public IActionResult Index()
         {
+            
+            var olsc_cod = HttpContext.Request.Cookies["olsc_cod"] ?? null;
+            if (olsc_cod == null)
+            {
+                CookieOptions option = new CookieOptions();
+                option.Expires = DateTime.Now.AddDays(1);
+                Response.Cookies.Append("olsc_cod", Guid.NewGuid().ToString(), option);
+            }
             return View();
         }
 

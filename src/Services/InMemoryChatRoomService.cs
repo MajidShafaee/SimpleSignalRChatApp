@@ -22,16 +22,17 @@ namespace SimpleSignalRChatApp.Services
             return Task.CompletedTask;
         }
 
-        public Task<Guid> CreateRoom(string connectionId)
+        public Task<Guid> CreateRoom(string cookieId, string connectionId)
         {
             var id = Guid.NewGuid();
             _roomInfo[id] = new ChatRoom
             {
-                OwnerConnectionId = connectionId
+                OwnerCookieId = cookieId,
+                ConnectionIds = { connectionId }
             };
 
             return Task.FromResult(id);
-        }
+        }        
 
         public Task<IReadOnlyDictionary<Guid, ChatRoom>> GetAllRooms()
         {
@@ -49,15 +50,12 @@ namespace SimpleSignalRChatApp.Services
                 .AsEnumerable();
 
             return Task.FromResult(sortedMessages);
-        }
+        }      
 
-        public Task<Guid> GetRoomForConnectionId(string connectionId)
+        public Task<Guid> GetRoomIdByCookie(string cookieId)
         {
             var foundRoom = _roomInfo.FirstOrDefault(
-                x => x.Value.OwnerConnectionId == connectionId);
-
-            if (foundRoom.Key == Guid.Empty)
-                throw new ArgumentException("Invalid connection ID");
+                 x => x.Value.OwnerCookieId == cookieId);
 
             return Task.FromResult(foundRoom.Key);
         }
@@ -71,5 +69,7 @@ namespace SimpleSignalRChatApp.Services
 
             return Task.CompletedTask;
         }
+
+        
     }
 }

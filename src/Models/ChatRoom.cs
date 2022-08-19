@@ -2,7 +2,12 @@
 {
     public class ChatRoom
     {
-        public string OwnerConnectionId { get; set; }
+        public ChatRoom()
+        {
+            ConnectionIds = new List<string>();
+        }
+        public string OwnerCookieId { get; set; }
+        public List<string> ConnectionIds { get; set; }
 
         public string Name { get; set; }
     }

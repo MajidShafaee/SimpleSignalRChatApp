@@ -5,7 +5,7 @@ using SimpleSignalRChatApp.Services;
 
 namespace SimpleSignalRChatApp.Hubs
 {
-    //[Authorize]
+    [Authorize]
     public class AgentHub:Hub
     {
        

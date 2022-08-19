@@ -8,10 +8,13 @@ namespace SimpleSignalRChatApp.Hubs
     {
         private readonly IChatRoomService _chatRoomService;
         private readonly IHubContext<AgentHub> _agentHub;
-        public ChatHub(IChatRoomService chatRoomService, IHubContext<AgentHub> agentHub)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public ChatHub(IChatRoomService chatRoomService, IHubContext<AgentHub> agentHub, IHttpContextAccessor httpContextAccessor)
         {
             _chatRoomService = chatRoomService;
             _agentHub = agentHub;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public override async Task OnConnectedAsync()
@@ -21,27 +24,44 @@ namespace SimpleSignalRChatApp.Hubs
                 // Authenticated agents don't need a room
                 await base.OnConnectedAsync();
                 return;
+            }            
+
+            var olsc_cod=_httpContextAccessor.HttpContext.Request.Cookies["olsc_cod"]?? null;
+            if(olsc_cod!=null)
+            {
+                var roomId= await _chatRoomService.GetRoomIdByCookie(olsc_cod);
+                if (roomId!=Guid.Empty)
+                {
+                    var history = await _chatRoomService
+                    .GetMessageHistory(roomId);
+
+                    await Clients.Caller.SendAsync(
+                        "ReceiveMessageesHistory", history);
+
+                    await Groups.AddToGroupAsync(Context.ConnectionId, roomId.ToString());                    
+                    await base.OnConnectedAsync();
+                }
+                else
+                {
+                    var newRoomId = await _chatRoomService.CreateRoom(olsc_cod,Context.ConnectionId);
+                    await Groups.AddToGroupAsync(Context.ConnectionId, newRoomId.ToString());
+                    await Clients.Caller.SendAsync(
+                        "ReceiveMessage",
+                        "ShopAssist",
+                        DateTimeOffset.UtcNow,
+                        "Hello! How can i help you?");
+                    await base.OnConnectedAsync();
+                }
+                return;
             }
-
-            var roomId = await _chatRoomService.CreateRoom(
-                Context.ConnectionId);
-
-            await Groups.AddToGroupAsync(
-                Context.ConnectionId, roomId.ToString());
-
-            await Clients.Caller.SendAsync(
-                "ReceiveMessage",
-                "ShopAssist",
-                DateTimeOffset.UtcNow,
-                "Hello! How can i help you?");
-
-            await base.OnConnectedAsync();
+            throw new Exception("cookie error");
+                       
         }
 
         public async Task SendMessage(string name, string text)
         {
-            var roomId = await _chatRoomService.GetRoomForConnectionId(
-                Context.ConnectionId);
+            var olsc_cod = _httpContextAccessor.HttpContext.Request.Cookies["olsc_cod"] ?? string.Empty;
+            var roomId = await _chatRoomService.GetRoomIdByCookie(olsc_cod);
 
             var message = new ChatMessage
             {
@@ -65,8 +85,9 @@ namespace SimpleSignalRChatApp.Hubs
         {
             var roomName = $"Chat with {visitorName} from the web";
 
-            var roomId = await _chatRoomService.GetRoomForConnectionId(
-                Context.ConnectionId);
+            var olsc_cod = _httpContextAccessor.HttpContext.Request.Cookies["olsc_cod"] ?? string.Empty;
+            var roomId = await _chatRoomService.GetRoomIdByCookie(
+                olsc_cod);
 
             await _chatRoomService.SetRoomName(roomId, roomName);
 

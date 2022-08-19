@@ -4,9 +4,9 @@ namespace SimpleSignalRChatApp.Services
 {
     public interface IChatRoomService
     {
-        Task<Guid> CreateRoom(string connectionId);
+        Task<Guid> CreateRoom(string cookieId,string connectionId);        
 
-        Task<Guid> GetRoomForConnectionId(string connectionId);
+        Task<Guid> GetRoomIdByCookie(string cookieId);        
 
         Task SetRoomName(Guid roomId, string name);
 

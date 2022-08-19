@@ -1,18 +1,14 @@
 ﻿var activeRoomId = '';
 
 var agentConnection = new signalR.HubConnectionBuilder()
-    .withUrl('/agentHub', options => {
-        //options.keepAliveIntervalInMilliseconds
-        //options.serverTimeoutInMilliseconds
-    })
+    .withUrl('/agentHub')
     .build();
 
 agentConnection.on('ActiveRooms', loadRooms);
-
 agentConnection.onclose(function () {
     handleDisconnected(startAgentConnection);
 });
-
+agentConnection.on('ReceiveMessages', addMessages);
 function startAgentConnection() {
     agentConnection
         .start()
@@ -21,6 +17,10 @@ function startAgentConnection() {
         });
 }
 
+
+
+
+
 var chatConnection = new signalR.HubConnectionBuilder()
     .withUrl('/chatHub')
     .build();
@@ -28,10 +28,7 @@ var chatConnection = new signalR.HubConnectionBuilder()
 chatConnection.onclose(function () {
     handleDisconnected(startChatConnection);
 });
-
 chatConnection.on('ReceiveMessage', addMessage);
-agentConnection.on('ReceiveMessages', addMessages);
-
 function startChatConnection() {
     chatConnection
         .start()

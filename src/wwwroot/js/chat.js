@@ -10,13 +10,7 @@ var connection = new signalR.HubConnectionBuilder()
     .build();
 
 connection.on('ReceiveMessage', renderMessage);
-
-connection.onclose(function () {
-    onDisconnected();
-    console.log('Reconnecting in 5 seconds...');
-    setTimeout(startConnection, 5000);
-})
-
+connection.on('ReceiveMessageesHistory', renderHistory);
 
 
 function startConnection() {
@@ -54,7 +48,7 @@ function sendMessage(text) {
 
 function ready() {
     setTimeout(showChatDialog, 750);
-
+    startConnection();
     var chatFormEl = document.getElementById('chatForm');
     chatFormEl.addEventListener('submit', function (e) {
         e.preventDefault();
@@ -64,19 +58,23 @@ function ready() {
         sendMessage(text);
     });
 
-    var welcomePanelEl = document.getElementById('chatWelcomePanel');
-    welcomePanelEl.addEventListener('submit', function (e) {
-        e.preventDefault();
+    //var welcomePanelEl = document.getElementById('chatWelcomePanel');
+    //welcomePanelEl.addEventListener('submit', function (e) {
+    //    e.preventDefault();
 
-        var name = e.target[0].value;
-        if (name && name.length) {
-            welcomePanelEl.style.display = 'none';
-            chatterName = name;
-            startConnection();
-        }
-    });
+    //    var name = e.target[0].value;
+    //    if (name && name.length) {
+    //        welcomePanelEl.style.display = 'none';
+    //        chatterName = name;
+    //        startConnection();
+    //    }
+    //});
 }
 
+function renderHistory(historyList) {
+    historyList.forEach(element => renderMessage(element.senderName, element.sentAt, element.text));
+
+}
 
 function renderMessage(name, time, message) {
     var nameSpan = document.createElement('span');

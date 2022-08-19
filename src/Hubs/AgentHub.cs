@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using SimpleSignalRChatApp.Models;
+using SimpleSignalRChatApp.Services;
 
 namespace SimpleSignalRChatApp.Hubs
 {
+    [Authorize]
     public class AgentHub:Hub
     {
-        [Authorize]
+       
         private readonly IChatRoomService _chatRoomService;
         private readonly IHubContext<ChatHub> _chatHub;
 

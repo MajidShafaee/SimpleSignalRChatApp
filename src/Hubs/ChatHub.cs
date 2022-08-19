@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using SimpleSignalRChatApp.Models;
+using SimpleSignalRChatApp.Services;
 
 namespace SimpleSignalRChatApp.Hubs
 {

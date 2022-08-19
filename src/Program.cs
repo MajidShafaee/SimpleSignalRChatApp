@@ -4,20 +4,28 @@ using SimpleSignalRChatApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddSignalR();
+
+
+//Options can be configured for all hubs by providing an options delegate to the AddSignalR
+builder.Services.AddSignalR(hubOptions =>
+{
+    hubOptions.EnableDetailedErrors = true;
+    hubOptions.KeepAliveInterval = TimeSpan.FromMinutes(1);
+    hubOptions.ClientTimeoutInterval = TimeSpan.FromMinutes(1);
+    
+});
+
 builder.Services.AddSingleton<IChatRoomService, InMemoryChatRoomService>();
 
 
 var app = builder.Build();
 
 
-// Configure the HTTP request pipeline.
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -28,7 +36,12 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapHub<ChatHub>("/chatHub");
+//Options for a single hub override the global options
+app.MapHub<ChatHub>("/chatHub", opt =>
+{
+    opt.WebSockets.CloseTimeout = TimeSpan.FromSeconds(10);  
+    
+});
 app.MapHub<AgentHub>("/agentHub");
 
 

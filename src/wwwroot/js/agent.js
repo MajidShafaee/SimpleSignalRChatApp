@@ -1,7 +1,10 @@
 ﻿var activeRoomId = '';
 
 var agentConnection = new signalR.HubConnectionBuilder()
-    .withUrl('/agentHub')
+    .withUrl('/agentHub', options => {
+        //options.keepAliveIntervalInMilliseconds
+        //options.serverTimeoutInMilliseconds
+    })
     .build();
 
 agentConnection.on('ActiveRooms', loadRooms);

@@ -6,11 +6,12 @@ namespace SimpleSignalRChatApp.Hubs
 {
     public class ChatHub: Hub
     {
-        private readonly IChatRoomService _chatRoomService;        
-
-        public ChatHub(IChatRoomService chatRoomService
+        private readonly IChatRoomService _chatRoomService;
+        private readonly IHubContext<AgentHub> _agentHub;
+        public ChatHub(IChatRoomService chatRoomService, IHubContext<AgentHub> agentHub)
         {
-            _chatRoomService = chatRoomService;            
+            _chatRoomService = chatRoomService;
+            _agentHub = agentHub;
         }
 
         public override async Task OnConnectedAsync()

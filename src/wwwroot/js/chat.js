@@ -6,6 +6,7 @@ var dialogEl = document.getElementById('chatDialog');
 // Initialize the SignalR client
 var connection = new signalR.HubConnectionBuilder()
     .withUrl('/chatHub')
+    .withAutomaticReconnect()
     .build();
 
 connection.on('ReceiveMessage', renderMessage);
@@ -15,6 +16,8 @@ connection.onclose(function () {
     console.log('Reconnecting in 5 seconds...');
     setTimeout(startConnection, 5000);
 })
+
+
 
 function startConnection() {
     connection.start()

@@ -17,13 +17,10 @@ builder.Services.AddSignalR(hubOptions =>
 
 });
 
+
 builder.Services.AddSingleton<IChatRoomService, InMemoryChatRoomService>();
-builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromMinutes(1);//You can set Time   
-});
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddSingleton<IHttpContextAccessorService, HttpContextAccessorService>();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -52,7 +49,6 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseSession();
 //Options for a single hub override the global options
 app.MapHub<ChatHub>("/chatHub", opt =>
 {

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SimpleSignalRChatApp.Models;
+using SimpleSignalRChatApp.Services;
 using System.Diagnostics;
 
 namespace SimpleSignalRChatApp.Controllers
@@ -7,22 +8,17 @@ namespace SimpleSignalRChatApp.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IHttpContextAccessorService _httpContextAccessorService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IHttpContextAccessorService httpContextAccessorService)
         {
+            _httpContextAccessorService = httpContextAccessorService;
             _logger = logger;
         }
 
         public IActionResult Index()
         {
-            
-            var olsc_cod = HttpContext.Request.Cookies["olsc_cod"] ?? null;
-            if (olsc_cod == null)
-            {
-                CookieOptions option = new CookieOptions();
-                option.Expires = DateTime.Now.AddDays(1);
-                Response.Cookies.Append("olsc_cod", Guid.NewGuid().ToString(), option);
-            }
+            _httpContextAccessorService.SetChatCookie(Response);
             return View();
         }
 

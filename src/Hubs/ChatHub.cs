@@ -8,13 +8,13 @@ namespace SimpleSignalRChatApp.Hubs
     {
         private readonly IChatRoomService _chatRoomService;
         private readonly IHubContext<AgentHub> _agentHub;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IHttpContextAccessorService _httpContextAccessorService;
 
-        public ChatHub(IChatRoomService chatRoomService, IHubContext<AgentHub> agentHub, IHttpContextAccessor httpContextAccessor)
+        public ChatHub(IChatRoomService chatRoomService, IHubContext<AgentHub> agentHub, IHttpContextAccessorService httpContextAccessorService)
         {
             _chatRoomService = chatRoomService;
             _agentHub = agentHub;
-            _httpContextAccessor = httpContextAccessor;
+            _httpContextAccessorService = httpContextAccessorService;
         }
 
         public override async Task OnConnectedAsync()
@@ -26,10 +26,10 @@ namespace SimpleSignalRChatApp.Hubs
                 return;
             }            
 
-            var olsc_cod=_httpContextAccessor.HttpContext.Request.Cookies["olsc_cod"]?? null;
-            if(olsc_cod!=null)
+            var chatCookieValue=await _httpContextAccessorService.GetUserChatCookieValue();
+            if(chatCookieValue != null)
             {
-                var roomId= await _chatRoomService.GetRoomIdByCookie(olsc_cod);
+                var roomId= await _chatRoomService.GetRoomIdByCookie(chatCookieValue);
                 if (roomId!=Guid.Empty)
                 {
                     var history = await _chatRoomService
@@ -43,7 +43,7 @@ namespace SimpleSignalRChatApp.Hubs
                 }
                 else
                 {
-                    var newRoomId = await _chatRoomService.CreateRoom(olsc_cod,Context.ConnectionId);
+                    var newRoomId = await _chatRoomService.CreateRoom(chatCookieValue, Context.ConnectionId);
                     await Groups.AddToGroupAsync(Context.ConnectionId, newRoomId.ToString());
                     await Clients.Caller.SendAsync(
                         "ReceiveMessage",
@@ -60,8 +60,8 @@ namespace SimpleSignalRChatApp.Hubs
 
         public async Task SendMessage(string name, string text)
         {
-            var olsc_cod = _httpContextAccessor.HttpContext.Request.Cookies["olsc_cod"] ?? string.Empty;
-            var roomId = await _chatRoomService.GetRoomIdByCookie(olsc_cod);
+            var chatCookieValue = await _httpContextAccessorService.GetUserChatCookieValue();
+            var roomId = await _chatRoomService.GetRoomIdByCookie(chatCookieValue);
 
             var message = new ChatMessage
             {
@@ -85,9 +85,9 @@ namespace SimpleSignalRChatApp.Hubs
         {
             var roomName = $"Chat with {visitorName} from the web";
 
-            var olsc_cod = _httpContextAccessor.HttpContext.Request.Cookies["olsc_cod"] ?? string.Empty;
+            var chatCookieValue = await _httpContextAccessorService.GetUserChatCookieValue();
             var roomId = await _chatRoomService.GetRoomIdByCookie(
-                olsc_cod);
+                chatCookieValue);
 
             await _chatRoomService.SetRoomName(roomId, roomName);
 

@@ -2,7 +2,7 @@
 {
     public interface IHttpContextAccessorService
     {
-        Task<string> GetUserChatCookieValue();
-        Task SetChatCookie(HttpResponse response);
+        Task<string> GetUserChatCookieValue(HttpContext httpContext);
+        Task SetChatCookie(HttpContext httpContext);
     }
 }

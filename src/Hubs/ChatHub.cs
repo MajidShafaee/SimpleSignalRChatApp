@@ -26,7 +26,7 @@ namespace SimpleSignalRChatApp.Hubs
                 return;
             }            
 
-            var chatCookieValue=await _httpContextAccessorService.GetUserChatCookieValue();
+            var chatCookieValue=await _httpContextAccessorService.GetUserChatCookieValue(Context.GetHttpContext());
             if(chatCookieValue != null)
             {
                 var roomId= await _chatRoomService.GetRoomIdByCookie(chatCookieValue);
@@ -60,7 +60,7 @@ namespace SimpleSignalRChatApp.Hubs
 
         public async Task SendMessage(string name, string text)
         {
-            var chatCookieValue = await _httpContextAccessorService.GetUserChatCookieValue();
+            var chatCookieValue = await _httpContextAccessorService.GetUserChatCookieValue(Context.GetHttpContext());
             var roomId = await _chatRoomService.GetRoomIdByCookie(chatCookieValue);
 
             var message = new ChatMessage
@@ -85,7 +85,7 @@ namespace SimpleSignalRChatApp.Hubs
         {
             var roomName = $"Chat with {visitorName} from the web";
 
-            var chatCookieValue = await _httpContextAccessorService.GetUserChatCookieValue();
+            var chatCookieValue = await _httpContextAccessorService.GetUserChatCookieValue(Context.GetHttpContext());
             var roomId = await _chatRoomService.GetRoomIdByCookie(
                 chatCookieValue);
 

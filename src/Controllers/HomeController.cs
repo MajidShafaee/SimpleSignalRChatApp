@@ -18,7 +18,7 @@ namespace SimpleSignalRChatApp.Controllers
 
         public IActionResult Index()
         {
-            _httpContextAccessorService.SetChatCookie(Response);
+            _httpContextAccessorService.SetChatCookie(HttpContext);
             return View();
         }
 

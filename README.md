@@ -16,7 +16,7 @@ A page has also been created for the support agent so that it can respond to the
 This page can be accessed through the **/agent** address with the any username and password: **password**
 
 ## Technical Review
-Cookies are used to tracking anonymouse users and keep the history of messages
+Cookies are used to tracking anonymouse users and keep the history of messages.  
 An interface for persisting and retrieving the history of messages has been created, which is implemented as a In-memory for the demo purpose.
 
 The following guide has been used to understanding lifetime events in SignalR and disconnection and reconnection scenarios.
